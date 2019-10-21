@@ -15,15 +15,12 @@
                 <label>事件分类</label>
                 <el-select v-model="queryParams.status" placeholder="请选择">
                     <el-option
-                            v-for="item in statusMap.get('all')"
+                            v-for="item in eventTypeMap.get('all')"
                             :key="item.value"
                             :label="item.text"
                             :value="item.value">
                     </el-option>
                 </el-select>
-            </div>
-            <div slot="operation">
-                <el-button @click="handleAddClick" type="primary">新增</el-button>
             </div>
         </SearchPannel>
         <TableBox v-model="pagination" :action="queryList" class="table">
@@ -62,7 +59,13 @@
                 </el-table-column>
             </el-table>
         </TableBox>
-        <el-dialog width="40%" center :visible.sync="showDialog">
+        <el-dialog center :visible.sync="showDialog">
+            <announcement v-if="dialogState[0]" ref="announcement"></announcement>
+            <battlepassMallAd v-if="dialogState[1]" ref="battlepassMallAd"></battlepassMallAd>
+            <legendMallAd v-if="dialogState[2]" ref="legendMallAd"></legendMallAd>
+            <limitedMallAd v-if="dialogState[3]" ref="limitedMallAd"></limitedMallAd>
+            <regularMail v-if="dialogState[4]" ref="regularMail"></regularMail>
+            <versionDesc v-if="dialogState[5]" ref="versionDesc"></versionDesc>
             <span slot="footer" class="dialog-footer">
             <el-button @click="closeDialog">通过</el-button>
             <el-button type="primary" @click="submitForm">拒绝</el-button>
@@ -72,18 +75,25 @@
 </template>
 
 <script>
-    import {announcementStatus} from '@/utils/constents'
+    import {approveStatus,eventTypeMap} from '@/utils/constents'
     import TableBox from '@/components/tableBox'
     import SearchPannel from '@/components/search-pannel'
     import colorText from '@/components/color-text'
+    import announcement from "./components/announcement";
+    import battlepassMallAd from "./components/battlepassMallAd";
+    import legendMallAd from "./components/legendMallAd";
+    import limitedMallAd from "./components/limitedMallAd";
+    import regularMail from "./components/regularMail";
+    import versionDesc from "./components/versionDesc";
     import {createNamespacedHelpers} from 'vuex'
     const {mapState} = createNamespacedHelpers('approveList');
 
     export default {
         name: "notice",
-        components:{TableBox,SearchPannel,colorText},
+        components:{TableBox,SearchPannel,colorText,announcement,battlepassMallAd,legendMallAd,limitedMallAd,regularMail,versionDesc},
         created() {
-            this.statusMap = announcementStatus;
+            this.statusMap = approveStatus;
+            this.eventTypeMap = eventTypeMap;
         },
         data(){
             return {
@@ -93,7 +103,8 @@
                     pageSize: 10,
                     total: 0
                 },
-                showDialog:false
+                showDialog:false,
+                dialogState:[0,0,0,0,0,0,0,0]
             }
         },
         computed:{
@@ -102,8 +113,45 @@
             })
         },
         methods:{
-            openDialog(){
+            openDialog(type){
+                let ref = '';
+                switch (type) {
+                    case '1':
+                    case '2':
+                        this.dialogState = [1,0,0,0,0,0,0,0];
+                        ref = 'announcement';
+                        break;
+                    case '3':
+                        this.dialogState = [0,1,0,0,0,0,0,0];
+                        ref = 'legendMallAd';
+                        break;
+                    case '4':
+                        this.dialogState = [0,0,1,0,0,0,0,0];
+                        ref = 'battlepassMallAd';
+                        break;
+                    case '5':
+                        this.dialogState = [0,0,0,1,0,0,0,0];
+                        ref = 'limitedMallAd';
+                        break;
+                    case '6':
+                        this.dialogState = [0,0,0,0,1,0,0,0];
+                        ref = 'regularMail';
+                        break;
+                    case '7':
+                        this.dialogState = [0,0,0,0,0,1,0,0];
+                        ref = 'versionDesc';
+                        break;
+                    case '8':
+                        this.dialogState = [0,0,0,0,0,0,1,0];
+                        ref = 'announcement';
+                        break;
+                    case '9':
+                        this.dialogState = [0,0,0,0,0,0,0,1];
+                        ref = 'announcement';
+                        break;
+                }
               this.showDialog = true;
+              return ref;
             },
             closeDialog(){
               this.showDialog = false
@@ -120,13 +168,10 @@
               }
             },
             handleEditClick(row){
-                this.openDialog();
+                this.openDialog(row.typeId);
                 this.$nextTick(()=>{
                     this.$refs['creditOrEdit'].initFormData(row);
                 })
-            },
-            handleAddClick(){
-                this.openDialog();
             },
             submitForm(){
               let data = this.$refs['creditOrEdit'].getData();

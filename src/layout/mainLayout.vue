@@ -22,7 +22,7 @@
                         text-color="#fff"
                         active-text-color="#fff">
                     <el-menu-item index="/approveList">
-                        <i class="iconfont icon-tingzhi"></i>
+                        <i class="iconfont icon-shenhe"></i>
                         <span slot="title">审核列表</span>
                     </el-menu-item>
                 </el-menu>

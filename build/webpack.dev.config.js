@@ -161,7 +161,7 @@ module.exports = {
                 // pathRewrite: {'^/cxtapi': '/cxtapi'}
             }
         },
-        port: 3000,
+        port: 4000,
         contentBase: path.join(__dirname, '../dist'), // boolean | string | array, static file location
         compress: true, // enable gzip compression
         historyApiFallback: true, // true for index.html upon 404, object for multiple paths

@@ -3,12 +3,12 @@
         <div class="login-main">
             <el-form :model="loginForm" :rules="formRules" ref="loginForm" label-width="0px" class="login-wrap">
                 <el-form-item label="">
-                    <div class="login-title">完美后台关系管理系统</div>
+                    <div class="login-title">完美后台审批系统</div>
                 </el-form-item>
                 <el-form-item label="" prop="username">
                     <el-input
                             placeholder="请输入用户名"
-                            prefix-icon="iconfont icontouxiang"
+                            prefix-icon="iconfont icon-touxiang"
                             v-model="loginForm.username">
                     </el-input>
                 </el-form-item>
@@ -16,7 +16,7 @@
                     <el-input
                             type="password"
                             placeholder="请输入密码"
-                            prefix-icon="iconfont iconmima"
+                            prefix-icon="iconfont icon-mima"
                             v-model="loginForm.password">
                     </el-input>
                 </el-form-item>
@@ -69,7 +69,7 @@
     .wrap-bg{
         height: 100%;
         overflow: auto;
-        background: url('../../assets/images/login-bg.png') no-repeat;
+        background: url('../../assets/images/bg.jpg') no-repeat;
         background-size: cover;
         position: relative;
     }
@@ -83,7 +83,8 @@
         .login-title{
             font-size: 26px;
             font-weight: 400;
-            color: #fff;
+            color: #000;
+            margin-bottom: 30px;
         }
         .login-action{
             width: 100%;
