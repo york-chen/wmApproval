@@ -1,2 +1,2 @@
-let env = "production";
+let env = "development";
 export default env;
