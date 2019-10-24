@@ -156,7 +156,7 @@ module.exports = {
     devServer: {
         proxy: { // proxy URLs to backend development server
             '/api': {
-                target: 'http://39.100.126.65:8192'
+                target: 'http://dev.zhongcheng.tech:8196'
                 // target: 'http://192.168.10.180:7001'
                 // pathRewrite: {'^/cxtapi': '/cxtapi'}
             }

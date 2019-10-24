@@ -36,7 +36,7 @@
 
 <script>
     import {createNamespacedHelpers} from 'vuex'
-    const {mapState,mapMutations} = createNamespacedHelpers('login');
+    const {mapState,mapActions} = createNamespacedHelpers('login');
     export default {
         name: "adminLayout",
         computed:{
@@ -48,8 +48,8 @@
             }
         },
         methods:{
-            ...mapMutations({
-                loginOut:'loginOut'
+            ...mapActions({
+                loginOut:'sendLoginout'
             }),
             _loginOut(){
                 this.loginOut();

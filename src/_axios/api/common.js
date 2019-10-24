@@ -1,15 +1,14 @@
 import axios from '@/_axios'
-
-export const $axLogin = params => {
+export const $axGetAreas = params => {
     return axios({
         method: 'post',
-        url: '/login'
+        url: '/area/search'
     }, params)
 };
 
-export const $axLogout = params => {
+export const $axGetLanguages = params => {
     return axios({
         method: 'post',
-        url: '/logout'
+        url: '/lang/search'
     }, params)
 };

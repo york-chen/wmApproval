@@ -1,19 +1,7 @@
 <template>
-    <el-form :model="form" :rules="rules" ref="form" label-width="80px" class="form-wrap">
-        <el-form-item label="广告选择" prop="styleType">
-            <el-select v-model="form.styleType" placeholder="请选择公告模板">
-                <el-option v-for="item in legendMallAdTypeMap.get('all')" :key="item.value" :label="item.text" :value="item.value"></el-option>
-            </el-select>
-        </el-form-item>
-        <el-form-item label="图片上传" prop="filelist">
-            <upload-file :limit="10" v-model="form.filelist"></upload-file>
-        </el-form-item>
-        <el-form-item v-if="form.filelist.length" label="图片预览">
-            <div class="preview-wrap">
-                <template v-for="item in form.filelist">
-                    <img class="preview" :src="item.url" :key="item.id" alt="">
-                </template>
-            </div>
+    <el-form :model="form" :rules="rules" ref="form" class="form-wrap" label-width="85px">
+        <el-form-item prop="content" label="预告内容">
+            <el-input type="textarea" :rows="5" v-model="form.content" placeholder="请输入预告内容"></el-input>
         </el-form-item>
         <el-form-item label="发布区组" required>
             <el-col :span="6">
@@ -32,32 +20,50 @@
             </el-col>
             <color-text type="warning">提示：请注意图片或文字是否与选择服务器一致</color-text>
         </el-form-item>
+        <el-form-item label="定时发布" prop="planPubStartTime">
+            <el-date-picker
+                    v-model="form.planPubStartTime"
+                    type="datetime"
+                    placeholder="选择定时发布时间">
+            </el-date-picker>
+            {{_planPubStartTime}}
+        </el-form-item>
+        <el-form-item label="定时关闭" prop="planPubEndTime">
+            <el-date-picker
+                    v-model="form.planPubEndTime"
+                    type="datetime"
+                    placeholder="选择定时关闭时间">
+            </el-date-picker>
+            {{_planPubEndTime}}
+        </el-form-item>
     </el-form>
 </template>
 <script>
-    import uploadFile from '@/components/upload-img'
+    import uploadFile from '@/components/upload-file'
     import areaMixin from '@/mixins/area-group'
     import colorText from '@/components/color-text'
-    import {legendMallAdTypeMap} from '@/utils/constents'
     export default {
         components:{uploadFile,colorText},
         mixins:[areaMixin],
         created(){
             this.rules = {
-                styleType: [{required: true, message: '请选择广告样式', trigger: 'change'}],
+                content: [{required: true, message: '请输入公告内容', trigger: 'blur'}],
                 publishAreaCode: [{required: true, message: '请选择发布区组', trigger: 'change'}],
                 languageCode: [{required: true, message: '请选择语言代号', trigger: 'change'}],
-                filelist: [{required: true, message: '请上传图片', trigger: 'change'}],
-            };
-            this.legendMallAdTypeMap = legendMallAdTypeMap;
+                planPubStartTime: [{required: true, message: '请选择定时发布时间', trigger: 'change'}],
+                pushTime: [{required: true, message: '请选择定时发布时间', trigger: 'change'}],
+                planPubEndTime: [{required: true, message: '请选择定时关闭时间', trigger: 'change'}]
+            }
         },
         data(){
             return{
                 form:{
-                    styleType:'',
+                    content: '',
+                    planPubStartTime:'',
+                    pushTime: '',
                     publishAreaCode:'',
                     languageCode:'',
-                    filelist:[]
+                    planPubEndTime:''
                 }
             }
         },
@@ -72,27 +78,24 @@
                 let flag = false;
                 this.$refs['form'].validate(valid=>{
                     flag = valid;
-                })
+                });
                 if(!flag){
-                    return flag
+                    return flag;
                 }else{
-                    let _form = JSON.parse(JSON.stringify(this.form));
-                    _form.imgCodes = _form.filelist.map(item=>item.imgCode);
-                    delete _form.filelist;
-                    return _form
+                    let planPubStartTime = this.form.planPubStartTime;
+                    let planPubEndTime = this.form.planPubEndTime;
+                    this.form.planPubStartTime = this.$dayjs(planPubStartTime).format('YYYY-MM-DD HH:mm:ss')
+                    this.form.planPubEndTime = this.$dayjs(planPubEndTime).format('YYYY-MM-DD HH:mm:ss')
+                    return this.form;
                 }
             }
         }
     }
 </script>
 <style type="text/scss" lang="scss">
-    .preview-wrap{
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        .preview{
-            width: 25%;
-            margin-right: 5%;
+    .form-wrap{
+        .strong{
+            font-weight: bold;
         }
     }
 </style>

@@ -21,6 +21,7 @@
     </div>
 </template>
 <script>
+import {$axUploadImg} from '@/_axios/api/common'
 export default {
     model:{
         prop:'_filelist',
@@ -47,23 +48,29 @@ export default {
         beforeUpload(file) {
             const valid = this.fileType.indexOf(file.type) !== -1;
             const isLt2M = file.size / 1024 / 1024 < this.fileSize;
-
             if (!valid) {
                 this.$message.error('文件格式不正确!');
+                return false
             }
             if (!isLt2M) {
-                this.$message.error('上传图片大小不能超过 2MB!');
+                this.$message.error(`上传图片大小不能超过 ${this.fileSize}MB!`);
+                return false
             }
-            return valid && isLt2M;
         },
         exceedCallback(files){
             this.$message.warning(`当前限制选择 ${this.limit} 个文件，本次选择了 ${files.length} 个文件。`);
         },
         uploadSuc(response,file,filelist){
-            this.$emit('change',this.filelist);
+            filelist.forEach(item=>{
+                if(item.uid === file.uid){
+                    item.imgCode = response.imgCode;
+                    item._url = response.url;
+                }
+            });
+            this.$emit('change',filelist.map(item=>({imgCode:item.imgCode,url:item._url,_url:item.url})));
         },
         removeFile(file,filelist){
-            this.$emit('change',filelist);
+            this.$emit('change',filelist.map(item=>({imgCode:item.imgCode,url:item._url,_url:item.url})));
         }
     }
 }

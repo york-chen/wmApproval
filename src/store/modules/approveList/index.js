@@ -1,9 +1,40 @@
+import {
+    $axGetList,axQueryAnnouncement,axQueryBattlepass,axQueryLengendMallAd,axQueryLimitedMallAd,
+    axQueryMainTenanceNotice,axQueryRegularMail,axQueryVersinDesc} from '@/_axios/api/approval'
+import { $axQueryBattlepass, $axQueryLengendMallAd, $axQueryLimitedMallAd, $axQueryMainTenanceNotice, $axQueryRegularMail, $axQueryVersinDesc } from '../../../_axios/api/approval';
+
 export default {
     namespaced: true,
     state: {
-        list:[{submitTime:'2019-10-01 13:51',typeId:'7',eventType:'版本描述',creator:'何丽萌',area:'PS4-北美',publishTime:'2019-10-01 13:51',endTime:'2019-10-01 13:51',status:'1'}]
+        list:[]
     },
     actions: {
-
+        sendGetList({state},data){
+            return $axGetList(data).then(res=>{
+                state.list = res.datas;
+                return res;
+            })
+        },
+        sendQueryAnnouncement({state},data){
+            return $axQueryAnnouncement(data)
+        },
+        sendQueryBattlepassMallAd(store,data){
+            return $axQueryBattlepass(data)
+        },
+        sendQueryLegendMallAd(store,data){
+            return $axQueryLengendMallAd(data)
+        },
+        sendQueryLimitedMallAd(store,data){
+            return $axQueryLimitedMallAd(data)
+        },
+        sendQueryMaintenanceNotice(store,data){
+            return $axQueryMainTenanceNotice(data)
+        },
+        sendQueryRegularMail(store,data){
+            return $axQueryRegularMail(data)
+        },
+        sendQueryVersionDesc(store,data){
+            return $axQueryVersinDesc(data)
+        }
     }
 }
