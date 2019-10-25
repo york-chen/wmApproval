@@ -57,6 +57,7 @@
         },
         data(){
             return{
+                disabled:true,
                 form:{
                     disabled:true,
                     content: '',
