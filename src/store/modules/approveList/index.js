@@ -1,7 +1,7 @@
 import {
     $axGetList,$axQueryAnnouncement,$axQueryBattlepass,$axQueryLengendMallAd,$axQueryLimitedMallAd,
     $axQueryMainTenanceNotice,$axQueryRegularMail,$axQueryVersinDesc,$axAuditAnnouncement,$axAuditVersionDesc,$axAuditMaintnotice,
-    $axAuditLegendMallAd,$axAuditLimitedMallAd,$axAuditBattlepassAd,$axAuditRegularMail} from '@/_axios/api/approval'
+    $axAuditLegendMallAd,$axAuditLimitedMallAd,$axAuditBattlepassAd,$axAuditRegularMail,$axReopen} from '@/_axios/api/approval'
 
 export default {
     namespaced: true,
@@ -56,6 +56,9 @@ export default {
         },
         sendAuditBattlepassAd(store,data){
             return $axAuditBattlepassAd(data)
+        },
+        sendReopen(store,data){
+            return $axReopen(data)
         }
     }
 }

@@ -1,4 +1,13 @@
+let btnStatus = {
+    _showExamine:false,//审批操作
+    _showReopen:false//重新打开
+};
 export default {
+    data(){
+        return {
+            btnStatus:{...btnStatus}
+        }
+    },
     methods:{
         queryStatusChange(){
             this.queryList()
@@ -13,6 +22,7 @@ export default {
                 case 'WAIT_PUSH':type = "success";break;
                 case 'REJECT':type = "danger";break;
             }
+            
         },
         getAreaLanguageData(){
             return Promise.all([this.$store.dispatch('common/sendGetAreas'),this.$store.dispatch('common/sendGetLanguages')])
@@ -20,5 +30,20 @@ export default {
         indexMethod(index) {
             return index +1;
         }
-    }
+    },
+    watch:{
+        showDialog(val){
+            if(!val){
+                this.btnStatus = {...btnStatus};
+            }else{
+                let status = this.cacheData.rowData.status;
+                if(status === 'WAIT_AUDIT'){
+                    this.btnStatus._showExamine = true;
+                }
+                if(status === 'WAIT_PUSH'){
+                    this.btnStatus._showReopen = true;
+                }
+            }
+        }
+    } 
 }

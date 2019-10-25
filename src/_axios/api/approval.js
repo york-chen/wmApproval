@@ -98,3 +98,9 @@ export const $axAuditRegularMail = params => {
         url: '/mailplan/audit'
     }, params)
 };
+export const $axReopen = params => {
+    return axios({
+        method: 'post',
+        url: '/audit/reopen'
+    }, params)
+};

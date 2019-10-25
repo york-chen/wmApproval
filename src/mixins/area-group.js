@@ -22,5 +22,5 @@ export default  {
         languageList(){
             return this.$store.state.common.languageList
         }
-    }
+    }   
 };

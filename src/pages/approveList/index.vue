@@ -37,7 +37,7 @@
                 </el-table-column>
                 <el-table-column prop="publisherName" label="发布者">
                 </el-table-column>
-                <el-table-column prop="publishAreaCode" label="发布区组">
+                <el-table-column prop="publishArea" label="发布区组">
                 </el-table-column>
                 <el-table-column prop="planPubStartTime" label="计划发布时间">
                 </el-table-column>
@@ -50,7 +50,7 @@
                 </el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="{row}">
-                        <asyncButton size="mini" label="查看" @_click="handleEditClick" :arguments="row" type="primary"></asyncButton>
+                        <asyncButton size="mini" label="查看" @_click="handleViewClick" :arguments="row" type="primary"></asyncButton>
                     </template>
                 </el-table-column>
             </el-table>
@@ -64,8 +64,13 @@
             <versionDesc v-if="dialogState[5]" ref="versionDesc"></versionDesc>
             <maintenanceNotice v-if="dialogState[6]" ref="maintenanceNotice"></maintenanceNotice>
             <span slot="footer" class="dialog-footer">
-            <asyncButton label="通过" @_click="passApproval" type="primary" exec_label="正在提交"></asyncButton>
-            <asyncButton label="拒绝" @_click="rejectApproval" type="primary" exec_label="正在提交"></asyncButton>
+                <template v-if="btnStatus._showExamine">
+                    <asyncButton label="通过" @_click="passApproval" type="primary" exec_label="正在提交"></asyncButton>
+                    <asyncButton label="拒绝" @_click="rejectApproval" type="primary" exec_label="正在提交"></asyncButton>
+                </template>
+                <template v-if="btnStatus._showReopen">
+                    <asyncButton  label="重新打开" @_click="reopenAction" type="primary" exec_label="正在提交"></asyncButton>
+                </template>
             </span>
         </el-dialog>
     </div>
@@ -95,6 +100,7 @@
         created() {
             this.statusMap = approveStatus;
             this.eventTypeMap = eventTypeMap;
+            this.cacheData = {};//将要用到的数据，保存着相应的弹出框对用的一系列方法
         },
         data(){
             return {
@@ -130,8 +136,8 @@
                 sendAuditLegendMallAd:'sendAuditLegendMallAd',
                 sendAuditLimitedMallAd:'sendAuditLimitedMallAd',
                 sendAuditRegularMail:'sendAuditRegularMail',
-                sendAuditBattlepassAd:'sendAuditBattlepassAd'
-
+                sendAuditBattlepassAd:'sendAuditBattlepassAd',
+                sendReopen:'sendReopen'
             }),
             formatAnnouncementData(data){
                 if(data.showButton){
@@ -215,7 +221,7 @@
             },
             passApproval(promise){
                 let cacheData = this.cacheData;
-                promise(cacheData.auditFunc({audit:'pass',businessId:cacheData.businessId}).then(()=>{
+                promise(cacheData.auditFunc({audit:'pass',businessId:cacheData.rowData.businessId}).then(()=>{
                     this.$message.success('操作成功！');
                     this.closeDialog();
                     this.queryList();
@@ -223,7 +229,14 @@
             },
             rejectApproval(promise){
                 let cacheData = this.cacheData;
-                promise(cacheData.auditFunc({audit:'reject',businessId:cacheData.businessId}).then(()=>{
+                promise(cacheData.auditFunc({audit:'reject',businessId:cacheData.rowData.businessId}).then(()=>{
+                    this.$message.success('操作成功！');
+                    this.closeDialog();
+                    this.queryList();
+                }))
+            },
+            reopenAction(promise){
+                promise(this.sendReopen({businessId:this.cacheData.rowData.businessId}).then(()=>{
                     this.$message.success('操作成功！');
                     this.closeDialog();
                     this.queryList();
@@ -232,9 +245,9 @@
             closeDialog(){
               this.showDialog = false
             },
-            handleEditClick(promise,row){
+            handleViewClick(promise,row){
                 let target = this.switchDialogConfig(row.businessType);
-                this.cacheData = {...target,businessId:row.businessId};
+                this.cacheData = {...target,rowData:row};
                 promise(Promise.all([this.getAreaLanguageData(),target.queryFunc({businessId:row.businessId})]).then(res=>{
                     let data = res[1];
                     target.formatFunc && (data=target.formatFunc(data));
