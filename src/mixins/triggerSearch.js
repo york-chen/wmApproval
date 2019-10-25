@@ -22,7 +22,6 @@ export default {
                 case 'WAIT_PUSH':type = "success";break;
                 case 'REJECT':type = "danger";break;
             }
-            
         },
         getAreaLanguageData(){
             return Promise.all([this.$store.dispatch('common/sendGetAreas'),this.$store.dispatch('common/sendGetLanguages')])
