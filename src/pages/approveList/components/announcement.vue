@@ -3,7 +3,7 @@
         <el-form-item label="公告模板" required>
             <el-col :span="6">
                 <el-form-item prop="eventType">
-                    <el-select v-model="form.eventType" placeholder="请选择公告模板">
+                    <el-select :disabled="disabled" v-model="form.eventType" placeholder="请选择公告模板">
                         <el-option v-for="item in templateTypeMap.get('all')" :key="item.value" :label="item.text" :value="item.value"></el-option>
                     </el-select>
                 </el-form-item>
@@ -12,7 +12,7 @@
                 <el-col class="line" :span="1">&nbsp;</el-col>
                 <el-col :span="6">
                     <el-form-item prop="styleType">
-                        <el-select v-model="form.styleType" placeholder="请选择图片模板">
+                        <el-select :disabled="disabled" v-model="form.styleType" placeholder="请选择图片模板">
                             <el-option v-for="item in templateMap.get('all')" :key="item.value" :label="item.text" :value="item.value"></el-option>
                         </el-select>
                     </el-form-item>
@@ -21,16 +21,13 @@
         </el-form-item>
         <template v-if="form.eventType ==='NOTICE_WORD'">
             <el-form-item label="公告标题" prop="title">
-                <el-input v-model="form.title"></el-input>
+                <el-input :disabled="disabled" v-model="form.title"></el-input>
             </el-form-item>
             <el-form-item label="公告内容" prop="content">
-                <el-input type="textarea" :rows="5" v-model="form.content"></el-input>
+                <el-input :disabled="disabled" type="textarea" :rows="5" v-model="form.content"></el-input>
             </el-form-item>
         </template>
         <template v-if="form.eventType==='NOTICE_IMG'">
-            <el-form-item label="图片上传" prop="filelist">
-                <upload-file :limit="3" v-model="form.filelist"></upload-file>
-            </el-form-item>
             <el-form-item v-if="form.filelist.length" label="图片预览">
                 <div class="preview-wrap">
                     <template v-for="item in form.filelist">
@@ -41,7 +38,7 @@
             <el-form-item v-if="form.filelist.length" label="显示按钮" prop="blank">
                 <el-col v-for="(item,index) in form.btns" :key="item.imgCode" :span="8">
                     <el-form-item :prop="'btns.'+ index +'.btn'" :rules="btnRule.btn">
-                        <el-select v-model="item.btn" placeholder="请选择显示按钮">
+                        <el-select :disabled="disabled" v-model="item.btn" placeholder="请选择显示按钮">
                             <el-option v-for="item in btnMap.get('all')" :key="item.value" :label="item.text" :value="item.value"></el-option>
                         </el-select>
                     </el-form-item>
@@ -51,14 +48,14 @@
         <el-form-item label="发布区组">
             <el-col :span="6">
                 <el-form-item prop="publishAreaCode">
-                    <el-select v-model="form.publishAreaCode" placeholder="请选择发布区组">
+                    <el-select :disabled="disabled" v-model="form.publishAreaCode" placeholder="请选择发布区组">
                         <el-option v-for="(item,index) in areaList" :key="index" :label="item.areaName" :value="item.areaCode"></el-option>
                     </el-select>
                 </el-form-item>
             </el-col>
             <el-col :span="6">
                 <el-form-item prop="languageCode">
-                    <el-select v-model="form.languageCode" placeholder="请选择语言包">
+                    <el-select :disabled="disabled" v-model="form.languageCode" placeholder="请选择语言包">
                         <el-option v-for="(item,index) in languageList" :key="index" :label="item.langName" :value="item.langCode"></el-option>
                     </el-select>
                 </el-form-item>
@@ -66,7 +63,7 @@
             <color-text type="warning">提示：请注意图片或文字是否与选择服务器一致</color-text>
         </el-form-item>
         <el-form-item label="定时发布" prop="planPubStartTime">
-            <el-date-picker
+            <el-date-picker :disabled="disabled"
                     v-model="form.planPubStartTime"
                     type="datetime"
                     placeholder="选择定时发布时间">
@@ -74,7 +71,7 @@
             {{_planPubStartTime}}
         </el-form-item>
         <el-form-item label="定时关闭" prop="planPubEndTime">
-            <el-date-picker
+            <el-date-picker :disabled="disabled"
                     v-model="form.planPubEndTime"
                     type="datetime"
                     placeholder="选择定时关闭时间">
@@ -84,12 +81,11 @@
     </el-form>
 </template>
 <script>
-    import uploadFile from '@/components/upload-img'
     import areaMixin from '@/mixins/area-group'
     import colorText from '@/components/color-text'
     import {templateMap,templateTypeMap,btnMap} from '@/utils/constents'
     export default {
-        components:{uploadFile,colorText},
+        components:{colorText},
         mixins:[areaMixin],
         created(){
             this.rules = {
@@ -113,6 +109,7 @@
         },
         data(){
             return{
+                disabled:true,
                 form:{
                     eventType:'NOTICE_WORD',
                     styleType:'',

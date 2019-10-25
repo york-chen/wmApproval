@@ -1,7 +1,7 @@
 import {
-    $axGetList,axQueryAnnouncement,axQueryBattlepass,axQueryLengendMallAd,axQueryLimitedMallAd,
-    axQueryMainTenanceNotice,axQueryRegularMail,axQueryVersinDesc} from '@/_axios/api/approval'
-import { $axQueryBattlepass, $axQueryLengendMallAd, $axQueryLimitedMallAd, $axQueryMainTenanceNotice, $axQueryRegularMail, $axQueryVersinDesc } from '../../../_axios/api/approval';
+    $axGetList,$axQueryAnnouncement,$axQueryBattlepass,$axQueryLengendMallAd,$axQueryLimitedMallAd,
+    $axQueryMainTenanceNotice,$axQueryRegularMail,$axQueryVersinDesc,$axAuditAnnouncement,$axAuditVersionDesc,$axAuditMaintnotice,
+    $axAuditLegendMallAd,$axAuditLimitedMallAd,$axAuditBattlepassAd,$axAuditRegularMail} from '@/_axios/api/approval'
 
 export default {
     namespaced: true,
@@ -35,6 +35,27 @@ export default {
         },
         sendQueryVersionDesc(store,data){
             return $axQueryVersinDesc(data)
+        },
+        sendAuditAnnouncement({state},data){
+            return $axAuditAnnouncement(data)
+        },
+        sendAuditVersionDesc(store,data){
+            return $axAuditVersionDesc(data)
+        },
+        sendAuditMaintnotice(store,data){
+            return $axAuditMaintnotice(data)
+        },
+        sendAuditLegendMallAd(store,data){
+            return $axAuditLegendMallAd(data)
+        },
+        sendAuditLimitedMallAd(store,data){
+            return $axAuditLimitedMallAd(data)
+        },
+        sendAuditRegularMail(store,data){
+            return $axAuditRegularMail(data)
+        },
+        sendAuditBattlepassAd(store,data){
+            return $axAuditBattlepassAd(data)
         }
     }
 }

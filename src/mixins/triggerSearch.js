@@ -3,6 +3,9 @@ export default {
         queryStatusChange(){
             this.queryList()
         },
+        queryEventTypeChange(){
+            this.queryList();
+        },
         formatStatusType(status){
             let type = 'primary';
             switch (status) {

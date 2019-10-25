@@ -55,3 +55,46 @@ export const $axQueryVersinDesc = params => {
         url: '/verdesc/get'
     }, params)
 };
+
+export const $axAuditAnnouncement = params => {
+    return axios({
+        method: 'post',
+        url: '/notice/audit'
+    }, params)
+};
+export const $axAuditVersionDesc = params => {
+    return axios({
+        method: 'post',
+        url: '/verdesc/audit'
+    }, params)
+};
+export const $axAuditMaintnotice = params => {
+    return axios({
+        method: 'post',
+        url: '/maintnotice/audit'
+    }, params)
+};
+export const $axAuditLegendMallAd = params => {
+    return axios({
+        method: 'post',
+        url: '/legendshopplan/audit'
+    }, params)
+};
+export const $axAuditLimitedMallAd = params => {
+    return axios({
+        method: 'post',
+        url: '/fixtimeshopplan/audit'
+    }, params)
+};
+export const $axAuditBattlepassAd = params => {
+    return axios({
+        method: 'post',
+        url: '/battlepassshopplan/audit'
+    }, params)
+};
+export const $axAuditRegularMail = params => {
+    return axios({
+        method: 'post',
+        url: '/mailplan/audit'
+    }, params)
+};

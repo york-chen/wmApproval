@@ -13,7 +13,7 @@
                 </el-select>
                 &nbsp;
                 <label>事件分类</label>
-                <el-select v-model="queryParams.businessType" placeholder="请选择">
+                <el-select @change="queryEventTypeChange" v-model="queryParams.businessType" placeholder="请选择">
                     <el-option
                             v-for="item in eventTypeMap.get('all')"
                             :key="item.value"
@@ -57,15 +57,15 @@
         </TableBox>
         <el-dialog center :visible.sync="showDialog">
             <announcement v-if="dialogState[0]" ref="announcement"></announcement>
-            <battlepassMallAd v-if="dialogState[1]" ref="battlepassMallAd"></battlepassMallAd>
-            <legendMallAd v-if="dialogState[2]" ref="legendMallAd"></legendMallAd>
+            <legendMallAd v-if="dialogState[1]" ref="legendMallAd"></legendMallAd>
+            <battlepassMallAd v-if="dialogState[2]" ref="battlepassMallAd"></battlepassMallAd>
             <limitedMallAd v-if="dialogState[3]" ref="limitedMallAd"></limitedMallAd>
             <regularMail v-if="dialogState[4]" ref="regularMail"></regularMail>
             <versionDesc v-if="dialogState[5]" ref="versionDesc"></versionDesc>
             <maintenanceNotice v-if="dialogState[6]" ref="maintenanceNotice"></maintenanceNotice>
             <span slot="footer" class="dialog-footer">
-            <asyncButton label="通过" @_click="submitForm" type="primary" exec_label="正在提交"></asyncButton>
-            <asyncButton label="拒绝" @_click="submitForm" type="primary" exec_label="正在提交"></asyncButton>
+            <asyncButton label="通过" @_click="passApproval" type="primary" exec_label="正在提交"></asyncButton>
+            <asyncButton label="拒绝" @_click="rejectApproval" type="primary" exec_label="正在提交"></asyncButton>
             </span>
         </el-dialog>
     </div>
@@ -123,7 +123,15 @@
                 sendQueryLimitedMallAd:'sendQueryLimitedMallAd',
                 sendQueryMaintenanceNotice:'sendQueryMaintenanceNotice',
                 sendQueryRegularMail:'sendQueryRegularMail',
-                sendQueryVersionDesc:'sendQueryVersionDesc'
+                sendQueryVersionDesc:'sendQueryVersionDesc',
+                sendAuditAnnouncement:'sendAuditAnnouncement',
+                sendAuditVersionDesc:'sendAuditVersionDesc',
+                sendAuditMaintnotice:'sendAuditMaintnotice',
+                sendAuditLegendMallAd:'sendAuditLegendMallAd',
+                sendAuditLimitedMallAd:'sendAuditLimitedMallAd',
+                sendAuditRegularMail:'sendAuditRegularMail',
+                sendAuditBattlepassAd:'sendAuditBattlepassAd'
+
             }),
             formatAnnouncementData(data){
                 if(data.showButton){
@@ -152,7 +160,7 @@
                 this.showDialog = true;
             },
             switchDialogConfig(type){
-                let ref = '',queryFunc,formatFunc;
+                let ref = '',queryFunc,formatFunc,auditFunc;
                 switch (type) {
                     case 'NOTICE_WORD':
                     case 'NOTICE_IMG':
@@ -160,52 +168,77 @@
                         ref = 'announcement';
                         queryFunc = this.sendQueryAnnouncement;
                         formatFunc = this.formatAnnouncementData;
+                        auditFunc = this.sendAuditAnnouncement;
                         break;
                     case 'LEGEND_AD':
                         this.dialogState = [0,1,0,0,0,0,0];
                         ref = 'legendMallAd';
                         queryFunc = this.sendQueryLegendMallAd;
-                        formatFunc = this.formatMallAdData
+                        formatFunc = this.formatMallAdData;
+                        auditFunc = this.sendAuditLegendMallAd;
                         break;
                     case 'BATTLE_AD':
                         this.dialogState = [0,0,1,0,0,0,0];
                         ref = 'battlepassMallAd';
                         queryFunc = this.sendQueryBattlepassMallAd;
-                        formatFunc = this.formatMallAdData
+                        formatFunc = this.formatMallAdData;
+                        auditFunc = this.sendAuditBattlepassAd;
                         break;
                     case 'FIX_TIME_AD':
                         this.dialogState = [0,0,0,1,0,0,0];
                         ref = 'limitedMallAd';
                         queryFunc = this.sendQueryLimitedMallAd;
                         formatFunc = this.formatMallAdData
+                        auditFunc = this.sendAuditLimitedMallAd;
                         break;
                     case 'MAIL_PLAN':
                         this.dialogState = [0,0,0,0,1,0,0];
                         ref = 'regularMail';
                         queryFunc = this.sendQueryRegularMail;
                         formatFunc = this.formatRegularMailData;
+                        auditFunc = this.sendAuditRegularMail;
                         break;
                     case 'VER_DESC':
                         this.dialogState = [0,0,0,0,0,1,0];
                         ref = 'versionDesc';
                         queryFunc = this.sendQueryVersionDesc;
+                        auditFunc = this.sendAuditVersionDesc;
                         break;
                     case 'MAINT_NOTICE':
                         this.dialogState = [0,0,0,0,0,0,1];
                         ref = 'maintenanceNotice';
                         queryFunc = this.sendQueryMaintenanceNotice;
+                        auditFunc = this.sendAuditMaintnotice;
                         break;
                 }
-              return {ref,queryFunc,formatFunc};
+              return {ref,queryFunc,formatFunc,auditFunc};
+            },
+            passApproval(promise){
+                let cacheData = this.cacheData;
+                promise(cacheData.auditFunc({audit:'pass',businessId:cacheData.businessId}).then(()=>{
+                    this.$message.success('操作成功！');
+                    this.closeDialog();
+                    this.queryList();
+                }))
+            },
+            rejectApproval(promise){
+                let cacheData = this.cacheData;
+                promise(cacheData.auditFunc({audit:'reject',businessId:cacheData.businessId}).then(()=>{
+                    this.$message.success('操作成功！');
+                    this.closeDialog();
+                    this.queryList();
+                }))
             },
             closeDialog(){
               this.showDialog = false
             },
             handleEditClick(promise,row){
                 let target = this.switchDialogConfig(row.businessType);
+                this.cacheData = {...target,businessId:row.businessId};
                 promise(Promise.all([this.getAreaLanguageData(),target.queryFunc({businessId:row.businessId})]).then(res=>{
                     let data = res[1];
-                    target.formatFunc && (data=target.formatFunc(data))
+                    target.formatFunc && (data=target.formatFunc(data));
+                    this.openDialog();
                     this.$nextTick(()=>{
                     this.$refs[target.ref].initFormData(data);
                 })
@@ -222,8 +255,6 @@
                 }
               }
             },
-            sendAddItem(data){},
-            sendEditItem(data){},
             queryList(){
                 this.tableLoading = true;
                 this.sendGetList({
