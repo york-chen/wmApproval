@@ -2,16 +2,30 @@
     <el-form :model="form" :rules="rules" ref="form" label-width="80px" class="form-wrap">
         <el-form-item label="广告选择" prop="styleType">
             <el-select :disabled="disabled" v-model="form.styleType" placeholder="请选择公告模板">
-                <el-option v-for="item in limitedMallAdTypeMap.get('all')" :key="item.value" :label="item.text" :value="item.value"></el-option>
+                <el-option v-for="item in legendMallAdTypeMap.get('all')" :key="item.value" :label="item.text" :value="item.value"></el-option>
             </el-select>
         </el-form-item>
-        <el-form-item v-if="form.filelist.length" label="图片预览">
-            <div class="preview-wrap">
-                <template v-for="item in form.filelist">
-                    <img class="preview" :src="item.url" :key="item.id" alt="">
-                </template>
-            </div>
-        </el-form-item>
+        <el-row class="imgs-wrap" v-if="form.styleType==='1'">
+            <el-col :span="8">
+                <el-row>
+                    <uploadImageBox :disabled="disabled" identity="1" v-model="form.imgs[0]" class="imgBox1"></uploadImageBox>
+                </el-row>
+                <el-row>
+                    <uploadImageBox :disabled="disabled" identity="2" v-model="form.imgs[1]" class="imgBox2"></uploadImageBox>
+                </el-row>
+            </el-col>
+            <el-col :span="8">
+                <uploadImageBox :disabled="disabled" identity="3" v-model="form.imgs[2]" class="imgBox3"></uploadImageBox>
+            </el-col>
+            <el-col :span="8">
+                <el-row>
+                    <uploadImageBox :disabled="disabled" identity="4" v-model="form.imgs[3]" class="imgBox1"></uploadImageBox>
+                </el-row>
+                <el-row>
+                    <uploadImageBox :disabled="disabled" identity="5" v-model="form.imgs[4]" class="imgBox2"></uploadImageBox>
+                </el-row>
+            </el-col>
+        </el-row>
         <el-form-item label="发布区组" required>
             <el-col :span="6">
                 <el-form-item prop="publishAreaCode">
@@ -34,18 +48,18 @@
 <script>
     import areaMixin from '@/mixins/area-group'
     import colorText from '@/components/color-text'
-    import {limitedMallAdTypeMap} from '@/utils/constents'
+    import uploadImageBox from '@/components/uploadImageBox'
+    import {legendMallAdTypeMap} from '@/utils/constents'
     export default {
-        components:{colorText},
+        components:{uploadImageBox,colorText},
         mixins:[areaMixin],
         created(){
             this.rules = {
                 styleType: [{required: true, message: '请选择广告样式', trigger: 'change'}],
                 publishAreaCode: [{required: true, message: '请选择发布区组', trigger: 'change'}],
                 languageCode: [{required: true, message: '请选择语言代号', trigger: 'change'}],
-                filelist: [{required: true, message: '请上传图片', trigger: 'change'}],
             };
-            this.limitedMallAdTypeMap = limitedMallAdTypeMap;
+            this.legendMallAdTypeMap = legendMallAdTypeMap;
         },
         data(){
             return{
@@ -54,7 +68,13 @@
                     styleType:'',
                     publishAreaCode:'',
                     languageCode:'',
-                    filelist:[]
+                    imgs:[
+                        {imgCode:'',url:''},
+                        {imgCode:'',url:''},
+                        {imgCode:'',url:''},
+                        {imgCode:'',url:''},
+                        {imgCode:'',url:''}
+                    ]
                 }
             }
         },
@@ -63,7 +83,7 @@
                 this.form = {
                     ...this.form,
                     ...data
-                }
+                };
             },
             getData(){
                 let flag = false;
@@ -74,22 +94,28 @@
                     return flag
                 }else{
                     let _form = JSON.parse(JSON.stringify(this.form));
-                    _form.imgCodes = _form.filelist.map(item=>item.imgCode);
-                    delete _form.filelist;
+                    _form.imgCodes = _form.imgs.map(item=>item.imgCode?item.imgCode:'').join(',');
+                    delete _form.imgs;
                     return _form
                 }
             }
         }
     }
 </script>
-<style type="text/scss" lang="scss">
-    .preview-wrap{
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        .preview{
-            width: 25%;
-            margin-right: 5%;
+<style type="text/scss" scoped lang="scss">
+    .imgs-wrap{
+        margin-bottom: 15px;
+        .imgBox1{
+            width: 300px;
+            height: 181px;
+        }
+        .imgBox2{
+            width: 300px;
+            height: 272px;
+        }
+        .imgBox3{
+            width: 300px;
+            height: 455px;
         }
     }
 </style>

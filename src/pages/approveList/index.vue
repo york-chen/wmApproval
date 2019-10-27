@@ -55,7 +55,7 @@
                 </el-table-column>
             </el-table>
         </TableBox>
-        <el-dialog center :visible.sync="showDialog">
+        <el-dialog width="960px" center :visible.sync="showDialog">
             <announcement v-if="dialogState[0]" ref="announcement"></announcement>
             <legendMallAd v-if="dialogState[1]" ref="legendMallAd"></legendMallAd>
             <battlepassMallAd v-if="dialogState[2]" ref="battlepassMallAd"></battlepassMallAd>
@@ -142,8 +142,7 @@
             formatAnnouncementData(data){
                 if(data.showButton){
                     let btns = data.showButton.split(',');
-                    data.filelist = data.imgs.map(item=>({imgCode:item.imgCode,url:item.url,_url:null}));
-                    data.btns = data.imgs.map((item,index)=>({imgCode:item.imgCode,url:item.url,_url:null,btn:btns[index]}));
+                    data.imgs = data.imgs.map((item,index)=>({imgCode:item.imgCode,url:item.url,buttonId:btns[index]}));
                 }
                 return data;
             },
@@ -156,10 +155,6 @@
                     data.publishGroup = 'PART'
                     data.userids = [{imgCode:data.assginUserIds.split(':')[1],url:''}]
                 }
-                return data
-            },
-            formatMallAdData(data){
-                data.filelist = data.imgs.map(item=>({imgCode:item.imgCode,url:item.url,_url:item.url}));
                 return data
             },
             openDialog(){
@@ -180,21 +175,18 @@
                         this.dialogState = [0,1,0,0,0,0,0];
                         ref = 'legendMallAd';
                         queryFunc = this.sendQueryLegendMallAd;
-                        formatFunc = this.formatMallAdData;
                         auditFunc = this.sendAuditLegendMallAd;
                         break;
                     case 'BATTLE_AD':
                         this.dialogState = [0,0,1,0,0,0,0];
                         ref = 'battlepassMallAd';
                         queryFunc = this.sendQueryBattlepassMallAd;
-                        formatFunc = this.formatMallAdData;
                         auditFunc = this.sendAuditBattlepassAd;
                         break;
                     case 'FIX_TIME_AD':
                         this.dialogState = [0,0,0,1,0,0,0];
                         ref = 'limitedMallAd';
                         queryFunc = this.sendQueryLimitedMallAd;
-                        formatFunc = this.formatMallAdData
                         auditFunc = this.sendAuditLimitedMallAd;
                         break;
                     case 'MAIL_PLAN':

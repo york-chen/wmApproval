@@ -27,24 +27,26 @@
                 <el-input :disabled="disabled" type="textarea" :rows="5" v-model="form.content"></el-input>
             </el-form-item>
         </template>
-        <template v-if="form.eventType==='NOTICE_IMG'">
-            <el-form-item v-if="form.filelist.length" label="图片预览">
-                <div class="preview-wrap">
-                    <template v-for="item in form.filelist">
-                        <img class="preview" :src="item._url||item.url" :key="item.imgCode" alt="">
-                    </template>
-                </div>
-            </el-form-item>
-            <el-form-item v-if="form.filelist.length" label="显示按钮" prop="blank">
-                <el-col v-for="(item,index) in form.btns" :key="item.imgCode" :span="8">
-                    <el-form-item :prop="'btns.'+ index +'.btn'" :rules="btnRule.btn">
-                        <el-select :disabled="disabled" v-model="item.btn" placeholder="请选择显示按钮">
-                            <el-option v-for="item in btnMap.get('all')" :key="item.value" :label="item.text" :value="item.value"></el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
-            </el-form-item>
-        </template>
+        <el-form-item v-if="form.eventType==='NOTICE_IMG'" label="图片上传">
+            <el-row>
+                <template v-for="(objImg,imgIndex) in form.imgs">
+                    <el-col :span="8" :key="imgIndex">
+                        <el-row>
+                            <el-form-item>
+                                <uploadImageBox :disabled="disabled" :identity="imgIndex+1+''" v-model="form.imgs[imgIndex]" class="imgBox"></uploadImageBox>
+                            </el-form-item>
+                        </el-row>
+                        <el-row>
+                            <el-form-item>
+                                <el-select :disabled="disabled" v-model="objImg.buttonId" placeholder="请选择显示按钮">
+                                    <el-option v-for="item in btnMap.get('all')" :key="item.value" :label="item.text" :value="item.value"></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-row>
+                    </el-col>
+                </template>
+        </el-row>
+        </el-form-item>
         <el-form-item label="发布区组">
             <el-col :span="6">
                 <el-form-item prop="publishAreaCode">
@@ -62,8 +64,12 @@
             </el-col>
             <color-text type="warning">提示：请注意图片或文字是否与选择服务器一致</color-text>
         </el-form-item>
+        <el-form-item label="发布版本" prop="vers">
+            <el-input :disabled="disabled" v-model="form.vers"></el-input>
+        </el-form-item>
         <el-form-item label="定时发布" prop="planPubStartTime">
-            <el-date-picker :disabled="disabled"
+            <el-date-picker
+                    :disabled="disabled"
                     v-model="form.planPubStartTime"
                     type="datetime"
                     placeholder="选择定时发布时间">
@@ -71,7 +77,8 @@
             {{_planPubStartTime}}
         </el-form-item>
         <el-form-item label="定时关闭" prop="planPubEndTime">
-            <el-date-picker :disabled="disabled"
+            <el-date-picker
+                    :disabled="disabled"
                     v-model="form.planPubEndTime"
                     type="datetime"
                     placeholder="选择定时关闭时间">
@@ -83,9 +90,10 @@
 <script>
     import areaMixin from '@/mixins/area-group'
     import colorText from '@/components/color-text'
+    import uploadImageBox from '@/components/uploadImageBox'
     import {templateMap,templateTypeMap,btnMap} from '@/utils/constents'
     export default {
-        components:{colorText},
+        components:{colorText,uploadImageBox},
         mixins:[areaMixin],
         created(){
             this.rules = {
@@ -97,11 +105,7 @@
                 languageCode: [{required: true, message: '请选择语言包', trigger: 'change'}],
                 planPubStartTime: [{required: true, message: '请选择定时发布时间', trigger: 'change'}],
                 planPubEndTime: [{required: true, message: '请选择定时关闭时间', trigger: 'change'}],
-                filelist: [{required: true, message: '请上传图片', trigger: 'change'}],
-                blank: [{required: true, message: '请输入公告标题', trigger: 'blur'}]
-            };
-            this.btnRule = {
-              btn:[{required: true, message: '请选择显示按钮', trigger: 'change'}]
+                vers: [{required: true, message: '请输入发布版本', trigger: 'blur'}],
             };
             this.templateMap = templateMap;
             this.templateTypeMap = templateTypeMap;
@@ -115,14 +119,13 @@
                     styleType:'',
                     title:'',
                     content:'',
-                    btns:[],
                     publishAreaCode:'',
                     languageCode:'',
                     planPubStartTime:'',
                     planPubEndTime:'',
-                    filelist:[],
-                    blank:'blank'//该字段没有作用，只是为了避免校验不过
-                }
+                    vers:'',
+                    imgs:[{buttonId:'',imgCode:'',url:''},{buttonId:'',imgCode:'',url:''},{buttonId:'',imgCode:'',url:''}]
+                },
             }
         },
         methods:{
@@ -153,7 +156,8 @@
                             "publishAreaCode":form.publishAreaCode,
                             "languageCode":form.languageCode,
                             "planPubStartTime": form.planPubStartTime,
-                            "planPubEndTime": form.planPubEndTime
+                            "planPubEndTime": form.planPubEndTime,
+                            vers:form.vers
                         }
                     }else{
                         data = {
@@ -165,34 +169,20 @@
                             "languageCode":form.languageCode,
                             "planPubStartTime": form.planPubStartTime,
                             "planPubEndTime": form.planPubEndTime,
-                            "imgCodes":form.btns.map(item=>item.imgCode).join(','),
-                            "showButton":form.btns.map(item=>item.btn).join(','),
+                            "imgCodes":form.imgs.map(item=>item.imgCode?item.imgCode:'{noop}').join(','),
+                            "showButton":form.imgs.map(item=>item.buttonId).join(','),
+                            vers:form.vers
                         }
                     }
                     return data;
                 }
             }
-        },
-        watch:{
-            'form.filelist'(){//为了解决按钮下拉框不 实时更新的 将就写法  以后再优化
-                let btns = this.form.btns,fileList = this.form.filelist,tempObj = {},arr = [];
-                btns.forEach(item=>{
-                    tempObj[item.imgCode] = item.btn;
-                });
-                arr = fileList.map(item=>({...item,btn:tempObj[item.imgCode]?tempObj[item.imgCode]:''}));
-                this.form.btns = arr;
-            }
         }
     }
 </script>
-<style type="text/scss" lang="scss">
-.preview-wrap{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    .preview{
-        width: 25%;
-        margin-right: 5%;
-    }
+<style type="text/scss" scoped lang="scss">
+.imgBox{
+    height: 153px;
+    width: 266px
 }
 </style>

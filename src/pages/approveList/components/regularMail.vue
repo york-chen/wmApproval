@@ -8,6 +8,7 @@
         </el-form-item>
         <el-form-item label="添加附件" required="">
             <div v-for="(appendix,index) in form.prop" :key="index" class="appendix-wrap">
+                <i @click="deleteAppendix(index)" class="el-icon-remove remove" v-if="form.prop.length>1&&!disabled"></i>
                 <el-col :span="11">
                     <el-form-item class="sub-form-item" :prop="'prop.'+ index +'.Id'" :rules="appendixRules.Id">
                         <el-input :disabled="disabled" placeholder="物品ID" v-model="appendix.Id"></el-input>
@@ -20,6 +21,9 @@
                     </el-form-item>
                 </el-col>
             </div>
+        </el-form-item>
+        <el-form-item v-if="!disabled" label="">
+            <el-button @click="addNewAppendix" type="text">继续添加</el-button>
         </el-form-item>
         <el-form-item label="发布区组" required>
             <el-col :span="6">
@@ -51,8 +55,11 @@
                 <el-option v-for="item in publishGroupMap.get('all')" :key="item.value" :label="item.text" :value="item.value"></el-option>
             </el-select>
         </el-form-item>
-        <el-form-item v-if="form.publishGroup==='PART'" label="上传用户ID" prop="userids">
+        <el-form-item v-if="form.publishGroup==='PART'&&!disabled" label="上传用户ID" prop="userids">
             <upload-file :disabled="disabled" :limit="1" v-model="form.userids"></upload-file>
+        </el-form-item>
+        <el-form-item v-if="form.publishGroup==='PART'&&disabled&&form.assginUserFile&&form.assginUserFile.url" label="查看用户ID">
+            <el-link target="_blank" download="用户ID.txt" :underline="false" :href="form.assginUserFile.url" type="primary">点击查看</el-link>
         </el-form-item>
     </el-form>
 </template>
@@ -115,12 +122,13 @@
                     return flag;
                 }else{
                     let _form = JSON.parse(JSON.stringify(this.form))
-                    console.log(_form)
                     if(_form.publishGroup === 'ALL'){
                         _form.assginUserIds = 'ALL';
                     }else{
                         _form.assginUserIds = `PART:${_form.userids[0].imgCode}`;
                     }
+                    _form.prop = JSON.stringify(_form.prop);
+                    _form.planPubStartTime = this.$dayjs(_form.planPubStartTime).format('YYYY-MM-DD HH:mm:ss');
                     delete _form.userids;
                     delete _form.publishGroup;
                     return _form
@@ -135,7 +143,7 @@
         }
     }
 </script>
-<style type="text/scss" lang="scss">
+<style type="text/scss" scoped lang="scss">
 .appendix-wrap{
     position: relative;
     .remove{

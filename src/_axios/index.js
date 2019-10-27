@@ -57,6 +57,7 @@ const httpServer = (opts, data) => {
         method: opts.method, // 必填
         url: `/api${opts.url}`, // 必填
         timeout: timeout,
+        onUploadProgress:opts.onUploadProgress,
         headers: Object.assign(headers, opts.headers)
     };
     let params = data || {};
