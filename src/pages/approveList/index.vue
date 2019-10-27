@@ -142,7 +142,7 @@
             formatAnnouncementData(data){
                 if(data.showButton){
                     let btns = data.showButton.split(',');
-                    data.imgs = data.imgs.map((item,index)=>({imgCode:item.imgCode,url:item.url,buttonId:btns[index]}));
+                    data.imgs = data.imgs.map((item,index)=>({imgCode:item.imgCode,url:item.url,buttonId:btns[index]==='0'?'':btns[index]}));
                 }
                 return data;
             },
