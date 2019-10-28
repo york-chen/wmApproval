@@ -265,7 +265,7 @@
                 this.sendGetList({
                     status:this.queryParams.status,
                     businessType:this.queryParams.businessType,
-                    pageindex:this.pagination.pageIndex,
+                    pageIndex:this.pagination.pageIndex,
                     pageSize:this.pagination.pageSize
                 }).then(res=>{
                     this.tableLoading = false;
